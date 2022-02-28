@@ -1,27 +1,35 @@
-
+import time
 import webbrowser
 from selenium import webdriver
-
-def openBrowser():
-    webbrowser.open('http://twitch.tv', new=2)
-
-def searchCategories():
-    browser = webdriver.Chrome('./chromedriver')
-
-    browser.get('https://python.org')
-    browser.save_screenshot("screenshot.png")
-
-    browser.close()
-
-def twitchChannel(name):
-
-    print(f'Hi, {name}')
+from selenium.webdriver import Keys
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.options import Options
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    searchCategories()
-    #openBrowser()
+#keeps connection alive for Chrome driver
+chrome_options = Options()
+chrome_options.add_experimental_option("detach", True)
 
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+#function to boot up Chrome, and search for Black or African American Tags on twitch (tags can be changed)
+def startup():
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
+    driver.get("https://www.twitch.tv/directory/")
+    print(driver.title)
+    search_bar = driver.find_element(by=By.XPATH,value="//input[@id='dropdown-search-input']")
+    search_bar.click()
+    time.sleep(2)
+    search_bar.send_keys("Black")
+    time.sleep(2)
+    search_bar.send_keys(Keys.ARROW_DOWN, Keys.RETURN)
+
+def channelSelection():
+
+
+
+startup()
+
+
