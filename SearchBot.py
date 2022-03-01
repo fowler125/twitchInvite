@@ -40,10 +40,41 @@ def login():
         #reads second line of file, stores in func variable password
         password = f.readline()
 
+    #entering in the twitch username for login
+    username_field = WebDriverWait(driver,10).until(
+        lambda x: x.find_element(by=By.XPATH,value="//input[@id='login-username']")
+    )
+    username_field.click()
+    username_field.send_keys(username)
 
 
-    print(username)
-    print(password)
+    #entering in the twitch password for login
+    password_field = WebDriverWait(driver,10).until(
+        lambda x : x.find_element(by=By.XPATH, value="//input[@id='password-input']")
+    )
+    password_field.click()
+    password_field.send_keys(password)
+
+    #click Login button
+    time.sleep(1)
+    submit_login = driver.find_element(by=By.XPATH, value="//*[@data-a-target='passport-login-button']")
+    submit_login.click()
+
+    #Two Factor Code from Authy App
+
+    confirmation_code_input = WebDriverWait(driver, 30).until(
+        lambda x: x.find_element(
+            by=By.XPATH, value="//*[@autocomplete='one-time-code']")
+    )
+    code = input('Please enter 2FA Code: ')
+    confirmation_code_input.send_keys(code)
+
+    submit_button = driver.find_element(
+        by=By.XPATH, value="//*[contains(text(), 'Submit')]")
+    submit_button.click()
+
+    #print(username)
+    #print(password)
 
 
 
