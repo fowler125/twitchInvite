@@ -1,5 +1,6 @@
 import time
 import webbrowser
+import random
 from selenium import webdriver
 from selenium.webdriver import Keys
 from selenium.webdriver.chrome.service import Service
@@ -76,8 +77,21 @@ def login():
     #print(username)
     #print(password)
 
+def get_random_black_channel():
+    time.sleep(5)
+    channels = WebDriverWait(driver, 10).until(
+        lambda x: x.find_elements(
+            by=By.XPATH, value="//a[@data-a-target='preview-card-title-link']")
+    )[:10]
+    random.shuffle(channels)
+    print(channels[0])
+
+#for caching all of the twitch black streamer names, in order make sure we dont send a bunch on invites to same streamer
+def data_exporter(name):
+
 
 
 startup()
 login()
+get_random_black_channel()
 
