@@ -35,8 +35,12 @@ def login():
 
     #read in the username and password from credentials file
     with open('credentials') as f:
+        #reads first line of file, stores in func variable username
         username = f.readline()
+        #reads second line of file, stores in func variable password
         password = f.readline()
+
+
 
     print(username)
     print(password)
