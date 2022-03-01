@@ -2,7 +2,7 @@ import time
 import webbrowser
 import random
 from selenium import webdriver
-from selenium.webdriver import Keys
+from selenium.webdriver import Keys, ActionChains
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
@@ -10,7 +10,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 
 
-#keeps connection alive for Chrome driver
+#keeps connection alive for Chrome driver so it does not close automatically after commands are done
 chrome_options = Options()
 chrome_options.add_argument("start-maximized")
 chrome_options.add_experimental_option("detach", True)
@@ -84,25 +84,41 @@ def get_random_black_channel():
             by=By.XPATH, value="//a[@data-a-target='preview-card-title-link']")
     )[:10]
     random.shuffle(channels)
-    print(channels[0])
+    return(channels[0])
 
 #for caching all of the twitch black streamer names, in order make sure we dont send a bunch on invites to same streamer
 def data_exporter(name):
     with open('streamer_names','a+') as z:
-        z.write(name)
         z.write('\n')
+        z.write(name)
 
+
+#checks the cached list of all streamers to see if they have already been added
 def redundancy_checker(name):
     with open('streamer_names','r') as z:
-        for line in z.readlines():
-            if z.readline() == name:
-                print("They are already present")
-            else:
-                data_exporter(name)
+        lines = [line.rstrip('\n') for line in z]
+        if name in lines:
+            print("They are already present")
+        else:
+            data_exporter(name)
+def sort_high_to_low():
+    sorter = WebDriverWait(driver, 10).until(
+        lambda x: x.find_element(by=By.XPATH, value="//a[@data-a-target='browse-sort-menu']")
+    )
+    sorter.click()
+    sorter.send_keys(Keys.TAB, Keys.TAB, Keys.TAB, Keys.RETURN)
 
 
-#startup()
-#login()
-#get_random_black_channel()
-redundancy_checker("test")
+def name_extractor():
+    twitch_channel= driver.current_url
+    name = twitch_channel.rstrip('https://www.twitch.tv/')
+    print(name)
 
+startup()
+login()
+channel = get_random_black_channel()
+ActionChains(driver).move_to_element(channel).perform()
+channel.click()
+name_extractor()
+#redundancy_checker("test")
+#driver.quit()
