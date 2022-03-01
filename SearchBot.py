@@ -88,10 +88,21 @@ def get_random_black_channel():
 
 #for caching all of the twitch black streamer names, in order make sure we dont send a bunch on invites to same streamer
 def data_exporter(name):
+    with open('streamer_names','a+') as z:
+        z.write(name)
+        z.write('\n')
+
+def redundancy_checker(name):
+    with open('streamer_names','r') as z:
+        for line in z.readlines():
+            if z.readline() == name:
+                print("They are already present")
+            else:
+                data_exporter(name)
 
 
-
-startup()
-login()
-get_random_black_channel()
+#startup()
+#login()
+#get_random_black_channel()
+redundancy_checker("test")
 
