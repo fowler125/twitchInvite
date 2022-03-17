@@ -1,9 +1,11 @@
 import time
 import webbrowser
 import random
+import os
 from selenium import webdriver
 from selenium.webdriver import Keys, ActionChains
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common import log
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
@@ -16,9 +18,9 @@ chrome_options.add_argument("start-maximized")
 chrome_options.add_experimental_option("detach", True)
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
 
+
 #function to boot up Chrome, and search for Black or African American Tags on twitch (tags can be changed)
 def startup():
-
     driver.get("https://www.twitch.tv/directory/")
     print(driver.title)
     search_bar = driver.find_element(by=By.XPATH,value="//input[@id='dropdown-search-input']")
@@ -100,7 +102,9 @@ def redundancy_checker(name):
         if name in lines:
             print("They are already present")
         else:
+            print("Adding the following user to the list:: " + name)
             data_exporter(name)
+
 def sort_high_to_low():
     sorter = WebDriverWait(driver, 10).until(
         lambda x: x.find_element(by=By.XPATH, value="//a[@data-a-target='browse-sort-menu']")
@@ -110,15 +114,26 @@ def sort_high_to_low():
 
 
 def name_extractor():
-    twitch_channel= driver.current_url
-    name = twitch_channel.rstrip('https://www.twitch.tv/')
-    print(name)
+    twitch_channel = driver.current_url
+    name = twitch_channel.removeprefix('https://www.twitch.tv/')
+    return(name)
+
+def check_for_start_watching():
+    button = WebDriverWait(driver, 10).until(
+        lambda x: x.find_element(by=By.XPATH, value="//button[@data-a-target='player-overlay-mature-accept']")
+    )
+    try:
+        button.click()
+    except Exception as e:
+        log.msg("Selenium Exception: {0} Message: {1}".format("my message", str(e)))
+
 
 startup()
 login()
 channel = get_random_black_channel()
 ActionChains(driver).move_to_element(channel).perform()
 channel.click()
-name_extractor()
-#redundancy_checker("test")
+check_for_start_watching()
+
+redundancy_checker(name_extractor())
 #driver.quit()
