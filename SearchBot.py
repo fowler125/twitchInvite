@@ -10,6 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import TimeoutException
 
 
 #keeps connection alive for Chrome driver so it does not close automatically after commands are done
@@ -106,6 +107,7 @@ def redundancy_checker(name):
             data_exporter(name)
 
 def sort_high_to_low():
+    time.sleep(3)
     sorter = WebDriverWait(driver, 10).until(
         lambda x: x.find_element(by=By.XPATH, value="//a[@data-a-target='browse-sort-menu']")
     )
@@ -119,21 +121,65 @@ def name_extractor():
     return(name)
 
 def check_for_start_watching():
+
+    try:
+        button = WebDriverWait(driver, 10).until(
+            lambda x: x.find_element(by=By.XPATH, value="//button[@data-a-target='player-overlay-mature-accept']")
+        )
+        button.click()
+    except TimeoutException:
+        pass
+
+def check_for_update_password():
     button = WebDriverWait(driver, 10).until(
-        lambda x: x.find_element(by=By.XPATH, value="//button[@data-a-target='player-overlay-mature-accept']")
+        lambda x: x.find_element(by=By.XPATH, value="//button[@data-a-target='account-checkup-generic-modal-secondary-button']")
+    )
+    try:
+        button.click()
+    except Exception as e:
+        log.msg("Selenium Exception: {0} Message: {1}".format("my message", str(e)))
+def whisper_button():
+    button = WebDriverWait(driver, 10).until(
+        lambda x: x.find_element(by=By.XPATH,value="//button[@data-a-target='whisper-box-button']")
     )
     try:
         button.click()
     except Exception as e:
         log.msg("Selenium Exception: {0} Message: {1}".format("my message", str(e)))
 
+def whisper_message(channel):
+    whisper_field = WebDriverWait(driver, 10).until(
+        lambda x: x.find_element(by=By.XPATH, value="//input[@id='threads-box-filter']")
+    )
+    whisper_field.click()
+    whisper_field.send_keys(channel)
+    whisper_field.send_keys(Keys.RETURN)
+
+def whisper_click(channel):
+    channel_lower = channel.lower()
+    first = f"//input[@id='whisper-search-result-{channel_lower}']"
+    print(first)
+    time.sleep(3)
+    #whisper_button = driver.find_element(by=By.XPATH, value=f"//input[@id='whisper-search-result-{channel_lower}']")
+    whisper_click = WebDriverWait(driver, 10).until(
+        lambda x: x.find_element(by=By.XPATH, value=f"{first}")
+    )
+    whisper_click.click()
+
 
 startup()
 login()
+check_for_update_password()
+#sort_high_to_low()
+time.sleep(10)
 channel = get_random_black_channel()
 ActionChains(driver).move_to_element(channel).perform()
 channel.click()
 check_for_start_watching()
+channel_name = name_extractor()
+redundancy_checker(channel_name)
+whisper_button()
+whisper_message(channel_name)
+whisper_click(channel_name)
 
-redundancy_checker(name_extractor())
 #driver.quit()
