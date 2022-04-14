@@ -121,7 +121,6 @@ def name_extractor():
     return(name)
 
 def check_for_start_watching():
-
     try:
         button = WebDriverWait(driver, 10).until(
             lambda x: x.find_element(by=By.XPATH, value="//button[@data-a-target='player-overlay-mature-accept']")
@@ -138,6 +137,7 @@ def check_for_update_password():
         button.click()
     except Exception as e:
         log.msg("Selenium Exception: {0} Message: {1}".format("my message", str(e)))
+
 def whisper_button():
     button = WebDriverWait(driver, 10).until(
         lambda x: x.find_element(by=By.XPATH,value="//button[@data-a-target='whisper-box-button']")
@@ -157,14 +157,39 @@ def whisper_message(channel):
 
 def whisper_click(channel):
     channel_lower = channel.lower()
-    first = f"//input[@id='whisper-search-result-{channel_lower}']"
+    first = f"//div[@data-a-target='whisper-search-result-{channel_lower}']"
     print(first)
     time.sleep(3)
     #whisper_button = driver.find_element(by=By.XPATH, value=f"//input[@id='whisper-search-result-{channel_lower}']")
     whisper_click = WebDriverWait(driver, 10).until(
-        lambda x: x.find_element(by=By.XPATH, value=f"{first}")
+        lambda x: x.find_element(by=By.XPATH, value=f"//div[@data-a-target='whisper-search-result-{channel_lower}']")
     )
     whisper_click.click()
+
+def check_for_whisper_off():
+    try:
+        whisper_click = WebDriverWait(driver, 10).until(
+            lambda x: x.find_element(by=By.XPATH, value="//p[contains(text(),'This user has turned on')]")
+        )
+        whisper_click.click()
+    except Exception as e:
+        pass
+
+def copy_paste(channel):
+    channel_lower = channel.lower()
+    whisper_click = WebDriverWait(driver, 10).until(
+        lambda x: x.find_element(by=By.XPATH, value="//input[@type='text']")
+    )
+    #whisper_click.click()
+    whisper_click.send_keys('Whats good i was in your stream earlier, '
+                            'i dont mean to disturb you, we got a black streamers discord, and '
+                            'we help support each other, so im going around twitch and trying to get all the '
+                            'black streamers so we can make this bread together: https://discord.gg/MBa7FaK9Ee')
+    whisper_click.send_keys(Keys.RETURN)
+    whisper_close = WebDriverWait(driver, 10).until(
+        lambda x: x.find_element(by=By.XPATH, value=f"//button[@data-a-target='thread-close-button-{channel_lower}']")
+    )
+    whisper_close.click()
 
 
 startup()
@@ -172,14 +197,20 @@ login()
 check_for_update_password()
 #sort_high_to_low()
 time.sleep(10)
-channel = get_random_black_channel()
-ActionChains(driver).move_to_element(channel).perform()
-channel.click()
-check_for_start_watching()
-channel_name = name_extractor()
-redundancy_checker(channel_name)
-whisper_button()
-whisper_message(channel_name)
-whisper_click(channel_name)
+count = 0
+while count < 5:
+    channel = get_random_black_channel()
+    ActionChains(driver).move_to_element(channel).perform()
+    channel.click()
+    check_for_start_watching()
+    channel_name = name_extractor()
+    redundancy_checker(channel_name)
+    whisper_button()
+    whisper_message(channel_name)
+    whisper_click(channel_name)
+    check_for_whisper_off()
+    copy_paste(channel_name)
+    count+1
+    driver.execute_script("window.history.go(-1)")
 
-#driver.quit()
+
