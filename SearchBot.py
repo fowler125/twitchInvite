@@ -191,26 +191,28 @@ def copy_paste(channel):
     )
     whisper_close.click()
 
+def main():
+    startup()
+    login()
+    check_for_update_password()
+    #sort_high_to_low()
+    time.sleep(10)
+    count = 0
+    while count < 5:
+        channel = get_random_black_channel()
+        ActionChains(driver).move_to_element(channel).perform()
+        channel.click()
+        check_for_start_watching()
+        channel_name = name_extractor()
+        redundancy_checker(channel_name)
+        whisper_button()
+        whisper_message(channel_name)
+        whisper_click(channel_name)
+        check_for_whisper_off()
+        copy_paste(channel_name)
+        count+1
+        driver.execute_script("window.history.go(-1)")
 
-startup()
-login()
-check_for_update_password()
-#sort_high_to_low()
-time.sleep(10)
-count = 0
-while count < 5:
-    channel = get_random_black_channel()
-    ActionChains(driver).move_to_element(channel).perform()
-    channel.click()
-    check_for_start_watching()
-    channel_name = name_extractor()
-    redundancy_checker(channel_name)
-    whisper_button()
-    whisper_message(channel_name)
-    whisper_click(channel_name)
-    check_for_whisper_off()
-    copy_paste(channel_name)
-    count+1
-    driver.execute_script("window.history.go(-1)")
-
+if __name__ == '__main__':
+    main()
 
