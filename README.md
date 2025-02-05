@@ -1,7 +1,8 @@
 # Twitch Streamer Outreach Bot
 
 ## Overview
-This project is a Python-based automation script that uses Selenium to interact with Twitch. The bot searches for streamers with specific tags (default: "Black"), logs in to a Twitch account, and sends them a predefined whisper message inviting them to a Discord community.
+This project is a Python-based automation script that uses Selenium to interact with Twitch.
+
 Please note as of February 4th, 2024 this project has been deprecated, due to Twitch not allowing automation software to access twitch thru selenium.
 ## Features
 - Automatically launches Chrome and navigates to Twitch.
